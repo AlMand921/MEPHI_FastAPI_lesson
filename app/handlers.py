@@ -2,8 +2,8 @@
 
 from fastapi import APIRouter, Body
 
-from .forms import UserNameParts
-from .query import getIp
+from .forms import UserNameParts, BirthDate
+from .query import getIp, getTime, getHoroscope, getZodiacSign
 
 router = APIRouter()
 
@@ -52,7 +52,28 @@ async def current_ip() -> str:
     ip = getIp()
     return ip
 
+@router.get("/users/current/full-time", name="Получить текущее время")
+async def current_full_time() -> dict:
+    ip = getIp()
+    time_data = getTime(ip)
 
+    return {
+        "ip": ip,
+        "time": time_data
+    }
+
+@router.post("/horoscope", name="Получить гороскоп")
+async def horoscope(birth_data: BirthDate) -> dict:
+    day = birth_data.birthDate.day
+    month = birth_data.birthDate.month
+
+    sign = getZodiacSign(day, month)
+    horoscope_data = getHoroscope(sign)
+
+    return {
+        "sign": sign,
+        "horoscope": horoscope_data
+    }
 # ЗАДАНИЕ 1: Реализуйте эндпоинт GET /users/current/full-time
 # Этот эндпоинт должен:
 # 1. Получить текущий IP-адрес пользователя (используйте функцию getIp())
